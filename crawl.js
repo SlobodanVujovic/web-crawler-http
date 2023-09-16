@@ -13,14 +13,14 @@ function getUrlsFromHtml(htmlPage, baseUrl) {
       try {
         const fullUrl = `${baseUrl}${linkHref}`;
         const linkObj = new URL(fullUrl);
-        urls.push(fullUrl);
+        urls.push(linkObj.href);
       } catch (error) {
         console.log(`Invalid relative URL: ${linkHref}`);
       }
     } else {
       try {
         const linkObj = new URL(linkHref);
-        urls.push(linkHref);
+        urls.push(linkObj.href);
       } catch (error) {
         console.log(`Invalid absolute URL: ${linkHref}`);
       }
