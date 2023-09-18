@@ -1,8 +1,21 @@
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-async function crawlUrl(currentUrl) {
-  console.log(`activly crawling of: ${currentUrl}`);
+async function crawlUrl(baseUrl, currentUrl, pages) {
+  const baseUrlObj = new URL(baseUrl);
+  const currentUrlObj = new URL(currentUrl);
+
+  if (baseUrlObj.hostname !== currentUrlObj.hostname) {
+    return pages;
+  }
+
+  const normalizedCurrentUrl = normalizeUrl(currentUrl);
+  if (pages[normalizedCurrentUrl] > 0) {
+    pages[normalizedCurrentUrl]++;
+    return pages;
+  }
+
+  pages[normalizedCurrentUrl] = 1;
 
   try {
     const resp = await fetch(currentUrl);
@@ -22,7 +35,16 @@ async function crawlUrl(currentUrl) {
       return;
     }
 
-    console.log(await resp.text());
+    console.log(`activly crawling of: ${currentUrl}`);
+    const pageBody = await resp.text();
+
+    const urls = getUrlsFromHtml(pageBody, baseUrl);
+
+    for (const pageUrl of urls) {
+      await crawlUrl(baseUrl, pageUrl, pages);
+    }
+
+    return pages;
   } catch (error) {
     console.log(`Error: ${error.message}, while crawling URL: ${currentUrl}`);
   }

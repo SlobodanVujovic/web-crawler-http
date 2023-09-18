@@ -1,6 +1,6 @@
 const { crawlUrl } = require("./crawl.js");
 
-function main() {
+async function main() {
   if (process.argv.length < 3) {
     console.log("Crawl URL missing");
     process.exit(1);
@@ -12,7 +12,13 @@ function main() {
 
   const currentUrl = process.argv[2];
   console.log(`Start crawling URL ${currentUrl}`);
-  crawlUrl(process.argv[2]);
+  const pages = await crawlUrl(currentUrl, currentUrl, {});
+
+  for (const page of Object.entries(pages)) {
+    console.log(page);
+  }
+
+  console.log("Done!");
 }
 
 main();
